@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello QuestionController!{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <h1>Quizz</h1>
+
+        <div id="answer-result" class="alert alert-success">
+            <i class="fas fa-thumbs-up"></i> Bravo, c'était la bonne réponse!
+        </div>
+
+        <h2 class="mt-4">Question n°<span id="question-id">0</span></h2>
+        <form id="question-form" method="post">
+            <p id="current-question-text" class="question-text">Texte de la question</p>
+            <div id="answers" class="d-flex flex-column">
+
+                <div class="custom-control custom-radio mb-2">
+                    <input class="custom-control-input" type="radio" name="answer" id="answer0"
+                        value="0">
+                    <label class="custom-control-label" for="answer0">Texte de la réponse</label>
+                </div>
+
+            </div>
+            <input type="hidden" name="current-question" value="0" />
+            <button type="submit" class="btn btn-primary">Valider</button>
+        </form>
+    </div>
+{% endblock %}

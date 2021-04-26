@@ -1,0 +1,14 @@
+.HomePage {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #DC001A;
+}
+
+.HomePage-title {
+    max-width: 400px;
+    margin: 0 auto;
+    color: white;
+    text-align: center;
+}
