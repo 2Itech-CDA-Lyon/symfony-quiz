@@ -10,19 +10,21 @@
             <i class="fas fa-thumbs-up"></i> Bravo, c'était la bonne réponse!
         </div>
 
-        <h2 class="mt-4">Question n°<span id="question-id">0</span></h2>
+        <h2 class="mt-4">Question n°<span id="question-id">{{ question.order }}</span></h2>
         <form id="question-form" method="post">
-            <p id="current-question-text" class="question-text">Texte de la question</p>
+            <p id="current-question-text" class="question-text">{{ question.text }}</p>
             <div id="answers" class="d-flex flex-column">
 
+            {% for answer in question.answers %}
                 <div class="custom-control custom-radio mb-2">
-                    <input class="custom-control-input" type="radio" name="answer" id="answer0"
-                        value="0">
-                    <label class="custom-control-label" for="answer0">Texte de la réponse</label>
+                    <input class="custom-control-input" type="radio" name="answer" id="answer-{{ answer.id }}"
+                        value="{{ answer.id }}">
+                    <label class="custom-control-label" for="answer-{{ answer.id }}">{{ answer.text }}</label>
                 </div>
+            {% endfor %}
 
             </div>
-            <input type="hidden" name="current-question" value="0" />
+            <input type="hidden" name="current-question" value="{{ question.id }}" />
             <button type="submit" class="btn btn-primary">Valider</button>
         </form>
     </div>

@@ -2,17 +2,26 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\QuestionRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class QuestionController extends AbstractController
 {
     /**
-     * @Route("/question", name="question_single")
+     * @Route("/question/{id}", name="question_single", requirements={"id"="\d+"})
      */
-    public function single(): Response
+    public function single(int $id, QuestionRepository $questionRepository): Response
     {
-        return $this->render('question/single.html.twig');
+        $question = $questionRepository->find($id);
+
+        if (is_null($question)) {
+            throw $this->createNotFoundException('Question #' . $id . ' does not exist.');
+        }
+
+        return $this->render('question/single.html.twig', [
+            'question' => $question,
+        ]);
     }
 }
