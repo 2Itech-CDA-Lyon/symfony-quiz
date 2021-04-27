@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=QuestionRepository::class)
+ * @ORM\Table(uniqueConstraints={@ORM\UniqueConstraint(name="unique_order_in_quiz", columns={"question_order", "quiz_id"})})
  */
 class Question
 {
