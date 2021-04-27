@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+    <section>
+        <h1>{{ quiz.title }}</h1>
+        <div>Écrit par: {{ quiz.author.email }}</div>
+        <div>Difficulté:     
+            {% for i in 1..quiz.difficulty %}
+                ⭐
+            {% endfor %}
+        </div>
+        <p>{{ quiz.description }}</p>
+        {% if firstQuestion %}
+            <a href="{{ path('question_single', { id: firstQuestion.id }) }}" class="btn btn-primary">Jouer</a>
+        {% else %}
+            <div class="alert alert-warning">Ce quiz ne contient aucune question pour l'instant.</div>
+        {% endif %}
+    </section>
+{% endblock %}
