@@ -21,4 +21,14 @@ class QuestionController extends AbstractController
             'question' => $question,
         ]);
     }
+
+    /**
+     * @Route("/{id}/edit", name="edit", requirements={"id"="\d+"}) 
+     */
+    public function question_edit(Question $question): Response
+    {
+        return $this->render('question/edit.html.twig', [
+            'question' => $question,
+        ]);
+    }
 }

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mode Création{% endblock %}
+
+{% block main %}
+    <section>
+        <h1>Mode Création</h1>
+
+        <h2>Liste des quiz modifiables</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Titre</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Difficulté</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for quiz in quizzes %}
+                <tr>
+                    <td>{{quiz.title}}</td>
+                    <td>{{quiz.description}}</td>
+                    <td>
+                        {% for i in 1..quiz.difficulty %}
+                        ⭐
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ path('quiz_edit', { id: quiz.id }) }}" class="btn btn-primary btn-sm">Modifier</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    
+        <a href="#" class="btn btn-primary">Ajouter un nouveau Quiz</a>
+{% endblock %}

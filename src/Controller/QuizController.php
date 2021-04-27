@@ -38,4 +38,26 @@ class QuizController extends AbstractController
             'firstQuestion' => $firstQuestion,
         ]);
     }
+
+    /**
+     * @Route("/create", name="create")
+     */
+    public function create(QuizRepository $repository): Response
+    {
+        $quizzes = $repository->findAll();
+
+        return $this->render('quiz/create.html.twig', [
+            'quizzes' => $quizzes,
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/edit", name="edit", requirements={"id"="\d+"})
+     */
+    public function edit(Quiz $quiz): Response
+    {
+        return $this->render('quiz/edit.html.twig', [
+            'quiz' => $quiz
+        ]);
+    }
 }

@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+    <h1 class="mb-4">Modifier un quiz</h1>
+    <form method="post mb-4">
+        <div class="mb-3 row">
+            <label for="title" class="col-sm-2 col-form-label">Titre</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="title" name="title" value="{{ quiz.title }}" />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="description" class="col-sm-2 col-form-label">Description</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="description" name="description" value="{{ quiz.description }}" />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="difficulty" class="col-sm-2 col-form-label">Difficulté</label>
+            <div class="col-sm-10">
+                <select class="form-control" name="difficulty">
+                    <option value="1" selected="{{ quiz.difficulty == 1 }}">Facile</option>
+                    <option value="2" selected="{{ quiz.difficulty == 2 }}">Moyen</option>
+                    <option value="3" selected="{{ quiz.difficulty == 3 }}">Difficile</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Valider les modifications</button>
+    </form>
+    <form class="mb-4" method="post">
+        <button type="submit" class="btn btn-danger">Supprimer ce quiz</button>
+    </form>
+
+    <h2 class="mb-4">Listes des questions</h2>
+
+    <ul class="list-group mb-4">
+    {% for question in quiz.questions %}
+        <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Question {{ question.order }} ></strong>
+                {{ question.text }}
+            </div>
+            <div>
+                <a href="{{ path('question_edit', {id: question.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
