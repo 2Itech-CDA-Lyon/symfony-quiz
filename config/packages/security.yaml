@@ -38,3 +38,5 @@ security:
     access_control:
         #- { path: ^/admin, roles: ROLE_ADMIN }
         #- { path: ^/, roles: ROLE_USER }
+        -  { path: ^/quiz/create, roles: ROLE_USER }
+        -  { path: ^/quiz/\d+/edit, roles: ROLE_USER }
