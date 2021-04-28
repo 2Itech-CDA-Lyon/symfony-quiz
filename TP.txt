@@ -1,0 +1,9 @@
+1 - Préparer la base de données à accueillir les données utilisateurs
+    -   symfony console doctrine:database:create
+    -   symfony console doctrine:migrations:migrate
+    -   symfony console doctrine:fixtures:load
+    
+2 - Créer un contrôleur avec des routes permettant de s'authentifier
+3 - Créer un formulaire d'authentification
+4 - Empêcher les utilisateurs non authentifiés d'accéder à certaines routes
+5 - Empêcher les utilisateurs qui ne sont pas auteurs d'un quiz à le modifier

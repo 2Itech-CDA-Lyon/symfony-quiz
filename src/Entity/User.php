@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -97,7 +98,7 @@ class User
     {
         if (!$this->quizzes->contains($quiz)) {
             $this->quizzes[] = $quiz;
-            $quiz->setAuthor($this);
+            $quiz->setUser($this);
         }
 
         return $this;
@@ -107,8 +108,8 @@ class User
     {
         if ($this->quizzes->removeElement($quiz)) {
             // set the owning side to null (unless already changed)
-            if ($quiz->getAuthor() === $this) {
-                $quiz->setAuthor(null);
+            if ($quiz->getUser() === $this) {
+                $quiz->setUser(null);
             }
         }
 
