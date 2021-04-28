@@ -65,19 +65,12 @@ class QuizController extends AbstractController
     public function edit(Quiz $quiz): Response
     {
 
-        /** @var \App\Entity\User $user */
-        $user = $this->getUser();
-        $userQuizzes = $user->getQuizzes();
-        foreach($userQuizzes as $userQuiz){
-            if ($userQuiz->getId() == $quiz->getId()){
+        if ($quiz->getAuthor() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        } else {
                 return $this->render('quiz/edit.html.twig', [
                     'quiz' => $quiz
                 ]);
-            }
-            else{
-                throw new AccessDeniedException("Vous ne pouvez pas modifier ce quizz !");
-            }
-        }
-       
+            } 
     }
 }

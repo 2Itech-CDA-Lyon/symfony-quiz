@@ -26,7 +26,7 @@
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <d class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0 mr-auto">
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ path('home') }}">Accueil</a>
@@ -38,6 +38,18 @@
                                     <a class="nav-link" href="{{ path('quiz_create') }}">Créer</a>
                                 </li>
                             </ul>
+                            <ul  class="navbar-nav ml-auto">
+                                {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                <li class="nav-item"><p class="navbar-text font-weight-bold">Bonjour {{app.user.email}} !</p></li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
+                                </li>
+                                {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
+                                </li>
+                                {% endif %}
+                            </ul>
                         </div>
                     </div>
                 </nav>
@@ -45,7 +57,6 @@
 
             <main>
                 <div class="container">
-                {% block flashMessage %}{% endblock %}
                     {% block main %}{% endblock %}
                 </div>
             </main>
