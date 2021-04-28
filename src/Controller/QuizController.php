@@ -58,6 +58,9 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/{id}/edit", name="edit", requirements={"id"="\d+"})
+     * Require ROLE_USER for only this controller method.
+     * 
+     * @IsGranted("ROLE_USER")
      */
     public function edit(Quiz $quiz): Response
     {
