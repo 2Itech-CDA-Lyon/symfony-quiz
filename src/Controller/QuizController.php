@@ -60,4 +60,22 @@ class QuizController extends AbstractController
             'quiz' => $quiz
         ]);
     }
+
+
+    /**
+     * @Route("quiz_delete", name="quiz_delete")
+     */
+    public function delete(Quiz $quiz): Response
+    {
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($quiz);
+        $entityManager->remove($quiz);
+        $entityManager->flush();
+        $this->addFlash('success', 'Votre quiz a bien été supprimé !');
+        return $this->redirectToRoute('quiz_create');
+        return $this->render('quiz/edit.html.twig', [
+            'quiz' => $quiz
+        ]);
+    }
 }

@@ -3,6 +3,13 @@
 {% block title %}Mode Création{% endblock %}
 
 {% block main %}
+    
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
     <section>
         <h1>Mode Création</h1>
 
@@ -33,6 +40,7 @@
             {% endfor %}
             </tbody>
         </table>
-    
-        <a href="#" class="btn btn-primary">Ajouter un nouveau Quiz</a>
+
+        <a href="{{ path('quiz_quiz_create') }}" class="btn btn-primary">Ajouter un nouveau Quiz</a>
+
 {% endblock %}
