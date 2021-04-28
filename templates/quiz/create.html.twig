@@ -17,7 +17,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for quiz in quizzes %}
+            {% for quiz in app.user.quizzes %}
                 <tr>
                     <td>{{quiz.title}}</td>
                     <td>{{quiz.description}}</td>
@@ -33,6 +33,5 @@
             {% endfor %}
             </tbody>
         </table>
-    
         <a href="#" class="btn btn-primary">Ajouter un nouveau Quiz</a>
 {% endblock %}
