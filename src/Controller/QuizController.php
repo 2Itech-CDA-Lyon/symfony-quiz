@@ -8,6 +8,8 @@ use App\Repository\QuestionRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/quiz", name="quiz_")
@@ -41,6 +43,9 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/create", name="create")
+     * Require ROLE_USER for only this controller method.
+     * 
+     * @IsGranted("ROLE_USER")
      */
     public function create(QuizRepository $repository): Response
     {
@@ -56,8 +61,20 @@ class QuizController extends AbstractController
      */
     public function edit(Quiz $quiz): Response
     {
-        return $this->render('quiz/edit.html.twig', [
-            'quiz' => $quiz
-        ]);
+
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        $userQuizzes = $user->getQuizzes();
+        foreach($userQuizzes as $userQuiz){
+            if ($userQuiz->getId() == $quiz->getId()){
+                return $this->render('quiz/edit.html.twig', [
+                    'quiz' => $quiz
+                ]);
+            }
+            else{
+                throw new AccessDeniedException("Vous ne pouvez pas modifier ce quizz !");
+            }
+        }
+       
     }
 }
