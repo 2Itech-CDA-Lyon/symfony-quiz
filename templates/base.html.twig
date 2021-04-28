@@ -34,9 +34,14 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ path('quiz_list') }}">Jouer</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ path('quiz_create') }}">Créer</a>
-                                </li>
+                                {% if app.user %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('quiz_create') }}">Créer</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </div>
                     </div>
