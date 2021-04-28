@@ -13,6 +13,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Quiz
 {
+
+ 
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -132,5 +134,11 @@ class Quiz
         }
 
         return $this;
+    }
+
+
+    public function __toString()
+    {
+        return $this->title;
     }
 }
