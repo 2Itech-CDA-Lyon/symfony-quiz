@@ -9,23 +9,26 @@ use App\Entity\Question;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AppFixtures extends Fixture
 {
     private $manager;
+    private $passwordEncoder;
 
-    public function __construct(EntityManagerInterface $manager)
+    public function __construct(EntityManagerInterface $manager, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->manager = $manager;
+        $this->passwordEncoder = $passwordEncoder;
     }
 
     public function load(ObjectManager $manager)
     {
         // Create users
-        $admin = $this->createUser('admin@test.com', 'admin', 'pouet');
-        $moderator = $this->createUser('moderator@test.com', 'moderator', 'truc');
-        $henriBrice = $this->createUser('henri-brice@test.com', 'henri-brice', 'bidule');
-        $adeleRoberte = $this->createUser('adele-roberte@test.com', 'adele-roberte', 'chouette');
+        $admin = $this->createUser('admin@test.com', 'admin', 'pouet', 'Admin');
+        $moderator = $this->createUser('moderator@test.com', 'moderator', 'truc', 'Moderateur');
+        $henriBrice = $this->createUser('henri-brice@test.com', 'henri-brice', 'bidule', 'Henri Brice');
+        $adeleRoberte = $this->createUser('adele-roberte@test.com', 'adele-roberte', 'chouette', 'Adele Roberte');
 
         // Create quizzes
         $quiz1 = $this->createQuiz('Divers faits étonnants', 'Etonnez-vous avec ces petites choses de la vie quotidienne que vous ignorez probablement!', 1, $henriBrice);
@@ -99,13 +102,14 @@ class AppFixtures extends Fixture
         $this->manager->flush();
     }
 
-    protected function createUser(string $email, string $password, string $secret): User
+    protected function createUser(string $email, string $password, string $secret, string $username): User
     {
         $user = new User();
         $user
             ->setEmail($email)
-            ->setPassword($password)
+            ->setPassword($this->passwordEncoder->encodePassword($user, $password))
             ->setSecret($secret)
+            ->setUsername($username)
         ;
         $this->manager->persist($user);
         return $user;
