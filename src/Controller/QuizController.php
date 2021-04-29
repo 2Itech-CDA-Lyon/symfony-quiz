@@ -4,16 +4,16 @@ namespace App\Controller;
 
 use App\Entity\Quiz;
 use App\Form\QuizType;
+use Symfony\Component\Form\Form;
 use App\Repository\QuizRepository;
 use App\Repository\QuestionRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/quiz", name="quiz_")
@@ -51,7 +51,7 @@ class QuizController extends AbstractController
      * 
      * @IsGranted("ROLE_USER")
      */
-    public function create(Request $request, QuizRepository $repository): Response
+    public function create(QuizRepository $repository): Response
     {
         $currentUser = $this->getUser();
         if ($currentUser->hasRole('ROLE_ADMIN')) {
@@ -68,7 +68,7 @@ class QuizController extends AbstractController
     /**
      * @Route("/new", name="new")
      */
-    public function new(Request $request, QuizRepository $repository): Response
+    public function new(Request $request, QuizRepository $repository, EntityManagerInterface $entityManager): Response
     {
         $quiz = new Quiz();
 
@@ -78,12 +78,12 @@ class QuizController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $data = $form->getData();
+            $data->setAuthor($this->getUser());
 
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($data);
             $entityManager->flush();
             $this->addFlash('success', 'Quiz ajouté avec succès');
-            return $this->redirectToRoute('quiz_create');
+            return $this->redirectToRoute('quiz_edit', ['id' => $quiz->getId()]);
         }
 
         return $this->render('quiz/new.html.twig', [
@@ -97,36 +97,18 @@ class QuizController extends AbstractController
      * 
      * @IsGranted("ROLE_USER")
      */
-    public function edit(Request $request, Quiz $quiz): Response
+    public function edit(Quiz $quiz, Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('EDIT', $quiz);
 
-        $form = $this->createFormBuilder($quiz)
-            ->add('title')
-            ->add('description')
-            ->add('difficulty')
-            ->add('save', SubmitType::class, ['label' => 'Modifier'])
-            ->add('Supprimer', SubmitType::class, array(
-                'label'  => 'Supprimer',
-                'attr'   =>  array(
-                    'class'   => 'btn btn-danger'
-                )
-            ))
-            ->getForm();
+        $form = $this->createForm(QuizType::class, $quiz);
 
         if ($form instanceof Form) {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
-                if ($form->getClickedButton() === $form->get('Supprimer')) {
-                    $this->addFlash('success', 'Quiz modifié avec succès');
-                    $em->remove($quiz);
-                } else if ($form->getClickedButton() === $form->get('save')) {
-                    $this->addFlash('success', 'Quiz supprimé avec succès');
-                    $em->persist($quiz);
-                }
-                $em->flush();
-                return $this->redirectToRoute('quiz_create');
+                $entityManager->persist($quiz);
+                $entityManager->flush();
+                $this->addFlash('success', 'Quiz modifié avec succès');
             }
         }
 
@@ -134,5 +116,17 @@ class QuizController extends AbstractController
             'quiz' => $quiz,
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/{id}/delete", name="delete", requirements={"id"="\d+"}, methods={"POST"})
+     */
+    public function delete(Quiz $quiz, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('EDIT', $quiz);
+
+        $entityManager->remove($quiz);
+        $entityManager->flush();
+        return $this->redirectToRoute('quiz_create');
     }
 }
