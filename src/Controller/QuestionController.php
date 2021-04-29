@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @Route("/question", name="question_")
@@ -30,9 +31,11 @@ class QuestionController extends AbstractController
 
     /**
      * @Route("/{id}/edit", name="edit", requirements={"id"="\d+"})
+     * @IsGranted("ROLE_USER")
      */
     public function edit(Request $request, Question $question): Response
     {
+        $this->denyAccessUnlessGranted('EDIT', $question);
 
         $form = $this->createFormBuilder($question)
             ->add('text')

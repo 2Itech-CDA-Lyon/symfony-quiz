@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/quiz", name="quiz_")
@@ -45,11 +47,18 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/create", name="create")
+     * Require ROLE_USER for only this controller method.
+     * 
+     * @IsGranted("ROLE_USER")
      */
     public function create(Request $request, QuizRepository $repository): Response
     {
-
-        $quizzes = $repository->findAll();
+        $currentUser = $this->getUser();
+        if ($currentUser->hasRole('ROLE_ADMIN')) {
+            $quizzes = $repository->findAll();
+        } else {
+            $quizzes = $currentUser->getQuizzes();
+        }
 
         return $this->render('quiz/create.html.twig', [
             'quizzes' => $quizzes,
@@ -84,15 +93,18 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/{id}/edit", name="edit", requirements={"id"="\d+"})
+     * Require ROLE_USER for only this controller method.
+     * 
+     * @IsGranted("ROLE_USER")
      */
     public function edit(Request $request, Quiz $quiz): Response
     {
+        $this->denyAccessUnlessGranted('EDIT', $quiz);
 
         $form = $this->createFormBuilder($quiz)
             ->add('title')
             ->add('description')
             ->add('difficulty')
-            ->add('author')
             ->add('save', SubmitType::class, ['label' => 'Modifier'])
             ->add('Supprimer', SubmitType::class, array(
                 'label'  => 'Supprimer',
@@ -117,6 +129,7 @@ class QuizController extends AbstractController
                 return $this->redirectToRoute('quiz_create');
             }
         }
+
         return $this->render('quiz/edit.html.twig', [
             'quiz' => $quiz,
             'form' => $form->createView(),

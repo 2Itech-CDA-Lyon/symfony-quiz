@@ -13,8 +13,6 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Quiz
 {
-
- 
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -38,15 +36,16 @@ class Quiz
     private $difficulty;
 
     /**
+     * @ORM\OneToMany(targetEntity=Question::class, mappedBy="quiz", orphanRemoval=true)
+     */
+    private $questions;
+
+    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="quizzes")
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $author;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Question::class, mappedBy="quiz", orphanRemoval=true)
-     */
-    private $questions;
 
     public function __construct()
     {
@@ -94,18 +93,6 @@ class Quiz
         return $this;
     }
 
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?User $author): self
-    {
-        $this->author = $author;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Question[]
      */
@@ -136,9 +123,16 @@ class Quiz
         return $this;
     }
 
-
-    public function __toString()
+    public function getAuthor(): ?User
     {
-        return $this->title;
+        return $this->author;
     }
+
+    public function setAuthor(?User $author): self
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
 }
