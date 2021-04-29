@@ -29,16 +29,12 @@ class QuestionController extends AbstractController
      * 
      * @IsGranted("ROLE_USER")
      */
-    public function question_edit(Question $question): Response
+    public function edit(Question $question): Response
     {
+        $this->denyAccessUnlessGranted('EDIT', $question);
 
-        if ($question->getQuiz()->getAuthor() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
-        } else {
-                return $this->render('question/edit.html.twig', [
-                    'question' => $question
-                ]);
-            } 
-        
+        return $this->render('question/edit.html.twig', [
+            'question' => $question
+        ]);
     }
 }
