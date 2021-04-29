@@ -47,13 +47,9 @@ class QuizController extends AbstractController
      * 
      * @IsGranted("ROLE_USER")
      */
-    public function create(QuizRepository $repository): Response
+    public function create(): Response
     {
-        $quizzes = $repository->findAll();
-
-        return $this->render('quiz/create.html.twig', [
-            'quizzes' => $quizzes,
-        ]);
+        return $this->render('quiz/create.html.twig');
     }
 
     /**
@@ -64,13 +60,12 @@ class QuizController extends AbstractController
      */
     public function edit(Quiz $quiz): Response
     {
-
         if ($quiz->getAuthor() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
-        } else {
-                return $this->render('quiz/edit.html.twig', [
-                    'quiz' => $quiz
-                ]);
-            } 
+        }
+
+        return $this->render('quiz/edit.html.twig', [
+            'quiz' => $quiz
+        ]);
     }
 }

@@ -26,10 +26,10 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         // Create users
-        $admin = $this->createUser('admin@test.com', 'admin', 'pouet');
-        $moderator = $this->createUser('moderator@test.com', 'moderator', 'truc');
-        $henriBrice = $this->createUser('henri-brice@test.com', 'henri-brice', 'bidule');
-        $adeleRoberte = $this->createUser('adele-roberte@test.com', 'adele-roberte', 'chouette');
+        $admin = $this->createUser('admin@test.com', 'admin', ['ROLE_ADMIN']);
+        $moderator = $this->createUser('moderator@test.com', 'moderator', ['ROLE_MODERATOR']);
+        $henriBrice = $this->createUser('henri-brice@test.com', 'henri-brice');
+        $adeleRoberte = $this->createUser('adele-roberte@test.com', 'adele-roberte');
 
         // Create quizzes
         $quiz1 = $this->createQuiz('Divers faits étonnants', 'Etonnez-vous avec ces petites choses de la vie quotidienne que vous ignorez probablement!', 1, $henriBrice);
@@ -103,13 +103,13 @@ class AppFixtures extends Fixture
         $this->manager->flush();
     }
 
-    protected function createUser(string $email, string $password, string $secret): User
+    protected function createUser(string $email, string $password, array $roles = []): User
     {
         $user = new User();
         $user
             ->setEmail($email)
             ->setPassword($this->passwordEncoder->encodePassword($user, $password))
-            ->setSecret($secret)
+            ->setRoles($roles)
         ;
         $this->manager->persist($user);
         return $user;
