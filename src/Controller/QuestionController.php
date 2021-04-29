@@ -6,6 +6,7 @@ use App\Entity\Question;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @Route("/question", name="question_")
@@ -23,12 +24,17 @@ class QuestionController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="edit", requirements={"id"="\d+"}) 
+     * @Route("/{id}/edit", name="edit", requirements={"id"="\d+"})
+     * Require ROLE_USER for only this controller method.
+     * 
+     * @IsGranted("ROLE_USER")
      */
-    public function question_edit(Question $question): Response
+    public function edit(Question $question): Response
     {
+        $this->denyAccessUnlessGranted('EDIT', $question);
+
         return $this->render('question/edit.html.twig', [
-            'question' => $question,
+            'question' => $question
         ]);
     }
 }

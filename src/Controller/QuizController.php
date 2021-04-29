@@ -8,6 +8,8 @@ use App\Repository\QuestionRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/quiz", name="quiz_")
@@ -41,10 +43,18 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/create", name="create")
+     * Require ROLE_USER for only this controller method.
+     * 
+     * @IsGranted("ROLE_USER")
      */
     public function create(QuizRepository $repository): Response
     {
-        $quizzes = $repository->findAll();
+        $currentUser = $this->getUser();
+        if ($currentUser->hasRole('ROLE_ADMIN')) {
+            $quizzes = $repository->findAll();
+        } else {
+            $quizzes = $currentUser->getQuizzes();
+        }
 
         return $this->render('quiz/create.html.twig', [
             'quizzes' => $quizzes,
@@ -53,9 +63,14 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/{id}/edit", name="edit", requirements={"id"="\d+"})
+     * Require ROLE_USER for only this controller method.
+     * 
+     * @IsGranted("ROLE_USER")
      */
     public function edit(Quiz $quiz): Response
     {
+        $this->denyAccessUnlessGranted('EDIT', $quiz);
+
         return $this->render('quiz/edit.html.twig', [
             'quiz' => $quiz
         ]);

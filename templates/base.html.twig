@@ -26,7 +26,7 @@
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <d class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0 mr-auto">
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ path('home') }}">Accueil</a>
@@ -38,6 +38,18 @@
                                     <a class="nav-link" href="{{ path('quiz_create') }}">Créer</a>
                                 </li>
                             </ul>
+                            <div class="navbar-nav ml-auto">
+                                {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                    <div class="nav-item"><p class="navbar-text font-weight-bold">Bonjour {{app.user.email}} !</p></div>
+                                    <div class="nav-item">
+                                        <a class="btn btn-secondary" href="{{ path('app_logout') }}">Déconnexion</a>
+                                    </div>
+                                {% else %}
+                                    <div class="nav-item">
+                                        <a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </nav>
