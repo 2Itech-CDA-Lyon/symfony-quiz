@@ -86,7 +86,9 @@ class QuizController extends AbstractController
             return $this->redirectToRoute('quiz_edit', ['id' => $quiz->getId()]);
         }
 
-        return $this->render('quiz/new.html.twig', [
+        return $this->render('quiz/edit.html.twig', [
+            'verb' => 'Ajouter',
+            'quiz' => $quiz,
             'form' => $form->createView(),
         ]);
     }
@@ -113,6 +115,7 @@ class QuizController extends AbstractController
         }
 
         return $this->render('quiz/edit.html.twig', [
+            'verb' => 'Modifier',
             'quiz' => $quiz,
             'form' => $form->createView(),
         ]);

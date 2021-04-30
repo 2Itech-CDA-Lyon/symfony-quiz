@@ -1,26 +1,32 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ verb }} un quiz{% endblock %}
+
 {% block main %}
 	
-    <h1 class="mb-4">Modifier un quiz</h1>
+    <h1 class="mb-4">{{ verb }} un quiz</h1>
     {{ form(form) }}
-    <form method="post" action="{{ path('quiz_delete', {id: quiz.id}) }}">
-        <button type="submit" class="btn btn-danger">Supprimer</button>
-    </form>
 
-    <h2 class="mb-4">Listes des questions</h2>
+    {% if quiz.id %}
+        <form method="post" action="{{ path('quiz_delete', {id: quiz.id}) }}">
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
 
-    <ul class="list-group mb-4">
-    {% for question in quiz.questions %}
-        <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-            <div>
-                <strong>Question {{ question.order }} ></strong>
-                {{ question.text }}
-            </div>
-            <div>
-                <a href="{{ path('question_edit', {id: question.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
-            </div>
-        </li>
-    {% endfor %}
-    </ul>
+        <h2 class="mb-4">Listes des questions</h2>
+
+        <ul class="list-group mb-4">
+        {% for question in quiz.questions %}
+            <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Question {{ question.order }} ></strong>
+                    {{ question.text }}
+                </div>
+                <div>
+                    <a href="{{ path('question_edit', {id: question.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
 {% endblock %}
