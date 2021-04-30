@@ -35,13 +35,21 @@
 
 {% block javascripts %}
 	<script>
+		const createAlert = (type, text) => {
+			const alertContainer = document.getElementById('alert-container');
+			const alert = document.createElement('div');
+			alert.classList.add('alert', 'alert-' + type, 'alert-dismissible', 'fade', 'show')
+			alert.innerHTML = '<div class="alert-text">' + text + '</div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+			alertContainer.appendChild(alert);
+		}
+
 		// Attend que la page soit chargée entièrement avant d'exécuter le code qui suit
 		window.addEventListener("DOMContentLoaded", (event) => {
 			// Récupère l'ensemble des boutons permettant de sélectionner la bonne réponse
 			const radioButtons = document.getElementsByName('rightAnswer');
 			// Associe à chaque bôuton une action au clic
 			{% for answer in question.answers %}
-			
+
 				radioButtons[{{ loop.index0 }}].addEventListener('click', () => {
 					// Envoie une requëte AJAX sur la route "modifier la bonne réponse à une question"
 					fetch('{{ path('question_right_answer', {id: question.id, answerId: answer.id}) }}', {
@@ -52,14 +60,14 @@
 						// Si le code de la réponse fait partie de la famille 200
 						if (response.ok) {
 							// Affiche un message de succès
-							alert('Bonne réponse modifiée avec succès!')
+							createAlert('success', 'Bonne réponse modifiée avec succès!')
 						// Sinon, produit une erreur
 						} else {
 							throw new Error(response.statusText);
 						}
 					})
 					// En cas d'erreur, affiche un message d'échec
-					.catch(error => alert('Une erreur s\'est produite pendant la modification de la bonne réponse.'))
+					.catch(error => createAlert('danger', 'Une erreur s\'est produite pendant la modification de la bonne réponse.'))
 				});
 
 			{% endfor %}
