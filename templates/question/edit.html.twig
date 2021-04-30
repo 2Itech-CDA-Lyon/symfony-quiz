@@ -18,7 +18,7 @@
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="rightAnswer" value="{{ answer.id }}" {% if question.rightAnswer.id == answer.id %} checked {% endif %}>
 					</div>
-					<input name="text_{{answer.id}}" type="text" class="form-control flex-grow-1" placeholder="Texte de la réponse" value="{{ answer.text }}"/>
+					<div class="flex-grow-1">{{ answer.text }}</div>
 
 					<a href="{{ path('answer_edit', {id: answer.id} ) }}" class="btn btn-primary btn-sm">Modifier</a>
 					<form method="post" action="{{ path('answer_delete', {id: answer.id}) }}">
@@ -31,4 +31,38 @@
 		<a href="{{ path('answer_new', {id: question.id}) }}" class="btn btn-primary">Ajouter une nouvelle réponse</a>
 	{% endif %}
 	<a href="{{ path('quiz_edit', {id: question.quiz.id}) }}" class="btn btn-secondary">Retour</a>
+{% endblock %}
+
+{% block javascripts %}
+	<script>
+		// Attend que la page soit chargée entièrement avant d'exécuter le code qui suit
+		window.addEventListener("DOMContentLoaded", (event) => {
+			// Récupère l'ensemble des boutons permettant de sélectionner la bonne réponse
+			const radioButtons = document.getElementsByName('rightAnswer');
+			// Associe à chaque bôuton une action au clic
+			{% for answer in question.answers %}
+			
+				radioButtons[{{ loop.index0 }}].addEventListener('click', () => {
+					// Envoie une requëte AJAX sur la route "modifier la bonne réponse à une question"
+					fetch('{{ path('question_right_answer', {id: question.id, answerId: answer.id}) }}', {
+						method: 'POST',
+					})
+					// Dès que la réponse est arrivée
+					.then(response => {
+						// Si le code de la réponse fait partie de la famille 200
+						if (response.ok) {
+							// Affiche un message de succès
+							alert('Bonne réponse modifiée avec succès!')
+						// Sinon, produit une erreur
+						} else {
+							throw new Error(response.statusText);
+						}
+					})
+					// En cas d'erreur, affiche un message d'échec
+					.catch(error => alert('Une erreur s\'est produite pendant la modification de la bonne réponse.'))
+				});
+
+			{% endfor %}
+		})
+	</script>
 {% endblock %}

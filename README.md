@@ -18,3 +18,4 @@
 | `GET,POST` | answer_new | `/answer/new/{question_id}` | `AnswerController` | `new` | Ajouter une réponse |
 | `GET,POST` | answer_edit | `/answer/{id}/edit` | `AnswerController` | `edit` | Modifier une réponse |
 | `POST` | answer_delete | `/answer/{id}/delete` | `AnswerController` | `delete` | Action de suppression d'une réponse |
+| `POST` | question_right_answer | `/question/{id}/right_answer/{answer_id}` | `QuestionController` | `rightAnswer` | Changer la bonne réponse à une question |
