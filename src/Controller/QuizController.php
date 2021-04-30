@@ -67,25 +67,28 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/new", name="new")
+     * @IsGranted("ROLE_USER")
      */
     public function new(Request $request, QuizRepository $repository, EntityManagerInterface $entityManager): Response
     {
+        // Crée un nouveau quiz
         $quiz = new Quiz();
-
+        // Crée un formulaire associé au quiz
         $form = $this->createForm(QuizType::class, $quiz);
-
+        // Demande au formulaire de récupérer sur le contenu de la requête
         $form->handleRequest($request);
+        // Si le formulaire vient d'ëtre envoyé (requête POST) et qu'il ne contient aucune erreur
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $data = $form->getData();
-            $data->setAuthor($this->getUser());
-
-            $entityManager->persist($data);
+            // Définit l'utilisateur authentifié comme auteur du quiz
+            $quiz->setAuthor($this->getUser());
+            // Modifie le quiz de la base de données
+            $entityManager->persist($quiz);
             $entityManager->flush();
             $this->addFlash('success', 'Quiz ajouté avec succès');
+            // Redirige sur la page "modification de quiz"
             return $this->redirectToRoute('quiz_edit', ['id' => $quiz->getId()]);
         }
-
+        // Affiche la page "créer un quiz"
         return $this->render('quiz/edit.html.twig', [
             'verb' => 'Ajouter',
             'quiz' => $quiz,
@@ -101,19 +104,20 @@ class QuizController extends AbstractController
      */
     public function edit(Quiz $quiz, Request $request, EntityManagerInterface $entityManager): Response
     {
+        // Vérifie que l'utilisateur authentifié a le droit de modifier le quiz demandé selon la politique de permissions définie dans les voters
         $this->denyAccessUnlessGranted('EDIT', $quiz);
-
+        // Crée un formulaire associé au quiz
         $form = $this->createForm(QuizType::class, $quiz);
-
-        if ($form instanceof Form) {
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $entityManager->persist($quiz);
-                $entityManager->flush();
-                $this->addFlash('success', 'Quiz modifié avec succès');
-            }
+        // Demande au formulaire de récupérer sur le contenu de la requête
+        $form->handleRequest($request);
+        // Si le formulaire vient d'ëtre envoyé (requête POST) et qu'il ne contient aucune erreur
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Modifie le quiz de la base de données
+            $entityManager->persist($quiz);
+            $entityManager->flush();
+            $this->addFlash('success', 'Quiz modifié avec succès');
         }
-
+        // Affiche la page "modifier un quiz"
         return $this->render('quiz/edit.html.twig', [
             'verb' => 'Modifier',
             'quiz' => $quiz,
@@ -126,10 +130,12 @@ class QuizController extends AbstractController
      */
     public function delete(Quiz $quiz, EntityManagerInterface $entityManager): Response
     {
+        // Vérifie que l'utilisateur authentifié a le droit de modifier le quiz demandé selon la politique de permissions définie dans les voters
         $this->denyAccessUnlessGranted('EDIT', $quiz);
-
+        // Supprime le quiz de la base de données
         $entityManager->remove($quiz);
         $entityManager->flush();
+        // Redirige sur la page "création de quiz"
         return $this->redirectToRoute('quiz_create');
     }
 }

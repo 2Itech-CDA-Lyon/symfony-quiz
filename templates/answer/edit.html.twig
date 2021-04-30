@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ verb }} une réponse{% endblock %}
+
+{% block main %}
+    <h1>{{ verb }} une réponse</h1>
+    {{ form(form) }}
+    <a href="{{ path('question_edit', {id: answer.question.id}) }}" class="btn btn-secondary">Retour</a>
+{% endblock %}
