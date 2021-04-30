@@ -37,7 +37,7 @@ class Question
     private $quiz;
 
     /**
-     * @ORM\OneToOne(targetEntity=Answer::class, cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Answer::class, cascade={"persist"})
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $rightAnswer;

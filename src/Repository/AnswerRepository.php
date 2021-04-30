@@ -19,6 +19,30 @@ class AnswerRepository extends ServiceEntityRepository
         parent::__construct($registry, Answer::class);
     }
 
+    /**
+     * Find the first answer from that same question than the provided answer, other than itself
+     *
+     * @param Answer $answer The answer
+     * @return Answer|null
+     */
+    public function findAnotherOneInSameQuestion(Answer $answer): ?Answer
+    {
+        // Crée une requête personnalisée dans laquelle on cherche...
+        return $this->createQueryBuilder('a')
+            // ...une seule réponse...
+            ->setMaxResults(1)
+            // ...associée à la même question que la réponse fournie...
+            ->andWhere('a.question = :question')
+            ->setParameter('question', $answer->getQuestion())
+            // ...et avec un ID différent de la réponse fournie
+            ->andWhere('a.id != :id')
+            ->setParameter('id', $answer->getId())
+            // Génère la requête et retourne le résultat sous la forme d'un seul objet, ou null
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     // /**
     //  * @return Answer[] Returns an array of Answer objects
     //  */

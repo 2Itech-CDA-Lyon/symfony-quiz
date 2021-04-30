@@ -23,7 +23,7 @@ class QuizVoter extends Voter
     {
         $user = $token->getUser();
 
-        if ($user->hasRole('ROLE_ADMIN')) {
+        if ($user !== 'anon.' && $user->hasRole('ROLE_ADMIN')) {
             return true;
         }
 

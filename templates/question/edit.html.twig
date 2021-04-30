@@ -1,34 +1,76 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ verb }} une question{% endblock %}
+
 {% block main %}
-    <h1 class="mb-4">Modifier une question</h1>
-    <form method="post mb-4">
-        <div class="mb-3 row">
-            <label for="text" class="col-sm-2 col-form-label">Texte</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="text" name="text" value="{{ question.text }}" />
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Valider les modifications</button>
-    </form>
-    <form class="mb-4" method="post">
-        <button type="submit" class="btn btn-danger">Supprimer cette question</button>
-    </form>
+	<h1 class="mb-4">{{ verb }} une question</h1>
+	{{ form(form) }}
 
-    <h2 class="mb-4">Listes des réponses</h2>
+	{% if question.id %}
+        <form method="post" action="{{ path('question_delete', {id: question.id}) }}">
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+		
+		<h2 class="mb-4">Listes des réponses</h2>
+		<ul class="list-group mb-4">
+			{% for answer in question.answers %}
+				<li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="rightAnswer" value="{{ answer.id }}" {% if question.rightAnswer.id == answer.id %} checked {% endif %}>
+					</div>
+					<div class="flex-grow-1">{{ answer.text }}</div>
 
-    <form>
-        <ul class="list-group mb-4">
-        {% for answer in question.answers %}
-            <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="rightAnswer" value="{{ answer.id }}" {% if question.rightAnswer.id == answer.id %} checked {% endif %}>
-                </div>
-                <input type="text" class="form-control flex-grow-1" placeholder="Text de la réponse" value="{{ answer.text }}" />
-                <button type="submit" class="btn btn-primary btn-sm">Valider</button>
-                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-            </li>
-        {% endfor %}
-        </ul>
-    </form>
+					<a href="{{ path('answer_edit', {id: answer.id} ) }}" class="btn btn-primary btn-sm">Modifier</a>
+					<form method="post" action="{{ path('answer_delete', {id: answer.id}) }}">
+						<button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+					</form>
+				</li>
+			{% endfor %}
+
+		</ul>
+		<a href="{{ path('answer_new', {id: question.id}) }}" class="btn btn-primary">Ajouter une nouvelle réponse</a>
+	{% endif %}
+	<a href="{{ path('quiz_edit', {id: question.quiz.id}) }}" class="btn btn-secondary">Retour</a>
+{% endblock %}
+
+{% block javascripts %}
+	<script>
+		const createAlert = (type, text) => {
+			const alertContainer = document.getElementById('alert-container');
+			const alert = document.createElement('div');
+			alert.classList.add('alert', 'alert-' + type, 'alert-dismissible', 'fade', 'show')
+			alert.innerHTML = '<div class="alert-text">' + text + '</div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+			alertContainer.appendChild(alert);
+		}
+
+		// Attend que la page soit chargée entièrement avant d'exécuter le code qui suit
+		window.addEventListener("DOMContentLoaded", (event) => {
+			// Récupère l'ensemble des boutons permettant de sélectionner la bonne réponse
+			const radioButtons = document.getElementsByName('rightAnswer');
+			// Associe à chaque bôuton une action au clic
+			{% for answer in question.answers %}
+
+				radioButtons[{{ loop.index0 }}].addEventListener('click', () => {
+					// Envoie une requëte AJAX sur la route "modifier la bonne réponse à une question"
+					fetch('{{ path('question_right_answer', {id: question.id, answerId: answer.id}) }}', {
+						method: 'POST',
+					})
+					// Dès que la réponse est arrivée
+					.then(response => {
+						// Si le code de la réponse fait partie de la famille 200
+						if (response.ok) {
+							// Affiche un message de succès
+							createAlert('success', 'Bonne réponse modifiée avec succès!')
+						// Sinon, produit une erreur
+						} else {
+							throw new Error(response.statusText);
+						}
+					})
+					// En cas d'erreur, affiche un message d'échec
+					.catch(error => createAlert('danger', 'Une erreur s\'est produite pendant la modification de la bonne réponse.'))
+				});
+
+			{% endfor %}
+		})
+	</script>
 {% endblock %}
