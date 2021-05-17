@@ -73,6 +73,7 @@ class QuestionController extends AbstractController
         return $this->render('question/edit.html.twig', [
             'verb' => 'Ajouter',
             'question' => $question,
+            'quiz_id' => $quiz->getId(),
             'form' => $form->createView(),
         ]);
     }
@@ -100,6 +101,7 @@ class QuestionController extends AbstractController
         return $this->render('question/edit.html.twig', [
             'verb' => 'Modifier',
             'question' => $question,
+            'quiz_id' => $question->getQuiz()->getId(),
             'form' => $form->createView(),
         ]);
     }
