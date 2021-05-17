@@ -7,6 +7,7 @@ use App\Repository\QuizRepository;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=QuizRepository::class)
@@ -21,16 +22,28 @@ class Quiz
     private $id;
 
     /**
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *  max=255,
+     * )
      * @ORM\Column(type="string", length=255)
      */
     private $title;
 
     /**
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *  max=255,
+     * )
      * @ORM\Column(type="string", length=255)
      */
     private $description;
 
     /**
+     * @Assert\Range(
+     *  min=1,
+     *  max=3,
+     * )
      * @ORM\Column(type="integer")
      */
     private $difficulty;

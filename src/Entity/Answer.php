@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AnswerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AnswerRepository::class)
@@ -18,6 +19,10 @@ class Answer
     private $id;
 
     /**
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *  max=255
+     * )
      * @ORM\Column(type="string", length=255)
      */
     private $text;
