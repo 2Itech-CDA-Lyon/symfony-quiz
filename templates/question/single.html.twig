@@ -6,12 +6,8 @@
     <div class="container">
         <h1>Quizz</h1>
 
-        <div id="answer-result" class="alert alert-success">
-            <i class="fas fa-thumbs-up"></i> Bravo, c'était la bonne réponse!
-        </div>
-
         <h2 class="mt-4">Question n°<span id="question-id">{{ question.order }}</span></h2>
-        <form id="question-form" method="post">
+        <form id="question-form" method="post" action="{{ path('question_answer', {id: question.id}) }}">
             <p id="current-question-text" class="question-text">{{ question.text }}</p>
             <div id="answers" class="d-flex flex-column">
 

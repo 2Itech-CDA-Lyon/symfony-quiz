@@ -9,6 +9,7 @@ use App\Form\AnswerType;
 use App\Form\QuestionFormType;
 use Symfony\Component\Form\Form;
 use App\Repository\AnswerRepository;
+use App\Repository\QuestionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -142,5 +143,42 @@ class QuestionController extends AbstractController
         $entityManager->persist($question);
         $entityManager->flush();
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Route("/{id}/answer", name="answer", methods={"POST"}, requirements={"id":"\d+"})
+     */
+    public function answer(Question $question, QuestionRepository $questionRepo, Request $request): Response
+    {
+        // Si le formulaire ne contient pas de numéro de réponse, renvoie sur la même question avec un message d'erreur
+        if (is_null($request->get('answer')) || empty($request->get('answer'))) {
+            $this->addFlash('danger', 'Aucune réponse n\'a été fournie.');
+            return $this->redirectToRoute('question_single', ['id' => $question->getId()]);
+        }
+
+        // Si l'utilisateur a donné la bonne réponse à la question demandée
+        if ($question->getRightAnswer()->getId() == $request->get('answer')){
+            $this->addFlash('success', '👍 Bravo, c\'était la bonne réponse!');
+        // Sinon
+        } else {
+            $this->addFlash('danger', '👎 Hé non! La bonne réponse était: ' . $question->getRightAnswer()->getText());
+        }
+
+        // Cherche la question...
+        $nextQuestion = $questionRepo->findOneBy([
+            // ...qui apparttient au même quiz que la question à laquelle on vient de répondre...
+            'quiz' => $question->getQuiz(),
+            // ...et qui la suite directement dans l'ordre
+            'order' => $question->getOrder() + 1
+        ]);
+
+        // S'il n'y a pas de question suivante, c'est donc qu'on a atteint la fin du quiz
+        if ($nextQuestion === null){
+            $this->addFlash('info', 'Quiz terminé !');
+            return $this->redirectToRoute('quiz_list');
+        }
+
+        // Sinon, redirige sur la page présentant la question suivante
+        return $this->redirectToRoute('question_single', ['id' => $nextQuestion->getId()]);
     }
 }
