@@ -48,6 +48,7 @@ class AnswerController extends AbstractController
         return $this->render('answer/edit.html.twig', [
             'verb' => 'Ajouter',
             'answer' => $answer,
+            'question_id' => $question->getId(),
             'form' => $form->createView(),
         ]);
     }
@@ -76,6 +77,7 @@ class AnswerController extends AbstractController
         return $this->render('answer/edit.html.twig', [
             'verb' => 'Modifier',
             'answer' => $answer,
+            'question_id' => $answer->getQuestion()->getId(),
             'form' => $form->createView(),
         ]);
     }

@@ -5,5 +5,5 @@
 {% block main %}
     <h1>{{ verb }} une réponse</h1>
     {{ form(form) }}
-    <a href="{{ path('question_edit', {id: answer.question.id}) }}" class="btn btn-secondary">Retour</a>
+    <a href="{{ path('question_edit', {id: question_id}) }}" class="btn btn-secondary">Retour</a>
 {% endblock %}

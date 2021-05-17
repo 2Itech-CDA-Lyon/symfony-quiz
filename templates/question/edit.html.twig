@@ -30,7 +30,7 @@
 		</ul>
 		<a href="{{ path('answer_new', {id: question.id}) }}" class="btn btn-primary">Ajouter une nouvelle réponse</a>
 	{% endif %}
-	<a href="{{ path('quiz_edit', {id: question.quiz.id}) }}" class="btn btn-secondary">Retour</a>
+	<a href="{{ path('quiz_edit', {id: quiz_id}) }}" class="btn btn-secondary">Retour</a>
 {% endblock %}
 
 {% block javascripts %}
