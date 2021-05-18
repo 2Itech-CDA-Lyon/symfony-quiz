@@ -69,6 +69,8 @@ class QuestionController extends AbstractController
             $entityManager->persist($question);
             $entityManager->flush();
             $this->addFlash('success', 'Question créée avec succès!');
+            // Redirige sur la page "modifier une question"
+            return $this->redirectToRoute('question_edit', ['id' => $question->getId()]);
         }
         // Affiche la page "modifier une question"
         return $this->render('question/edit.html.twig', [
@@ -168,7 +170,7 @@ class QuestionController extends AbstractController
         $nextQuestion = $questionRepo->findOneBy([
             // ...qui apparttient au même quiz que la question à laquelle on vient de répondre...
             'quiz' => $question->getQuiz(),
-            // ...et qui la suite directement dans l'ordre
+            // ...et qui la suit directement dans l'ordre
             'order' => $question->getOrder() + 1
         ]);
 
