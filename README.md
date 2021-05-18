@@ -16,6 +16,7 @@
 | `GET,POST` | question_new | `/question/new/{quiz_id}` | `QuestionController` | `new` | Créer une nouvelle question |
 | `GET,POST` | question_edit | `/question/{id}/edit` | `QuestionController` | `edit` | Modifier / supprimer une question déjà existante / Liste des réponses dans la question / Ajouter des réponses à la question / Supprimer des réponses de la question |
 | `POST` | question_delete | `/question/{id}/delete` | `QuestionController` | `delete` | Action de suppression d'une question |
+| `POST` | question_reorder | `/question/{id}/reorder` | `QuestionController` | `reorder` | Action de changement d'ordre d'une question |
 | `GET,POST` | answer_new | `/answer/new/{question_id}` | `AnswerController` | `new` | Ajouter une réponse |
 | `GET,POST` | answer_edit | `/answer/{id}/edit` | `AnswerController` | `edit` | Modifier une réponse |
 | `POST` | answer_delete | `/answer/{id}/delete` | `AnswerController` | `delete` | Action de suppression d'une réponse |

@@ -25,16 +25,75 @@ class QuestionRepository extends ServiceEntityRepository
      * @param Question $question
      * @return Question[]
      */
-    public function findInSameQuizWithGreaterOrder(Question $question): array
+    public function findInSameQuizWithGreaterOrder(Question $question, ?int $targetOrder = null): array
     {
-        return $this->createQueryBuilder('q')
+        // Si on n'est pas dans un cas de réordonnement
+        if (is_null($targetOrder)) {
+            $minOrder = $question->getOrder();
+            $orderBy = 'ASC';
+        // Sinon
+        } else {
+            // Détermine la valeur la plus faible et la valeur plus forte entre l'ordre initial de la question et l'ordre désiré
+            if ($targetOrder > $question->getOrder()){
+                $minOrder = $question->getOrder();
+                $maxOrder = $targetOrder;
+                $orderBy = 'ASC';
+            } else {
+                $minOrder = $targetOrder;
+                $maxOrder = $question->getOrder();
+                $orderBy = 'DESC';
+            }
+        }
+        
+        // Cherche toutes les questions...
+        $query = $this->createQueryBuilder('q')
+            // ...appartenant au même quiz...
             ->where('q.quiz = :quiz')
             ->setParameter('quiz', $question->getQuiz())
-            ->andWhere('q.order > :order')
-            ->setParameter('order', $question->getOrder())
-            ->orderBy('q.order', 'ASC')
+            // ...différentes de la question concernée...
+            ->andWhere('q.id != :id')
+            ->setParameter('id', $question->getId())
+            // ...avec une valeur d'ordre supérieure ou égale à la valeur minimum déterminée précédemment
+            ->andWhere('q.order >= :minOrder')
+            ->setParameter('minOrder', $minOrder)
+        ;
+
+        // Si une valeur d'ordre maximum a été déterminée
+        if (isset($maxOrder)) {
+            // Complète la requête
+            $query
+                // ...avec une valeur d'ordre inférieure ou égale à la valeur maximum déterminée précédemment
+                ->andWhere('q.order <= :maxOrder')
+                ->setParameter('maxOrder', $maxOrder)
+            ;
+        }
+
+        // Compléte et exécute la requête
+        return $query
+            // ...triées dans l'ordre déterminée précédemment
+            ->orderBy('q.order', $orderBy)
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    /**
+     * Count the questions from the same quiz
+     *
+     * @param Question $question
+     * @return int
+     */
+    public function countInSameQuiz(Question $question): int
+    {
+        // Compte les questions...
+        return $this->createQueryBuilder('q')
+            ->select('COUNT(q.id)')
+            ->where('q.quiz = :quiz')
+            // ...appartenant au même quiz
+            ->setParameter('quiz', $question->getQuiz())
+            ->getQuery()
+            // Récupère le résultat de la requête sous forme de nombre
+            ->getSingleScalarResult()
         ;
     }
 

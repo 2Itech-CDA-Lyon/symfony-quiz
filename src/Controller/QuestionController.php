@@ -116,12 +116,12 @@ class QuestionController extends AbstractController
     {
         // Vérifie que l'utilisateur authentifié a le droit de modifier la question demandée selon la politique de permissions définie dans les voters
         $this->denyAccessUnlessGranted('EDIT', $question);
+        // Récupère toutes les questions appartenant au même quiz, et avec un ordre strictement supérieur à celui de la question supprimée
+        $questionsToReorder = $questionRepository->findInSameQuizWithGreaterOrder($question);
         // Supprime la question en base de données
         $entityManager->remove($question);
         $entityManager->flush();
 
-        // Récupère toutes les questions appartenant au même quiz, et avec un ordre strictement supérieur à celui de la question supprimée
-        $questionsToReorder = $questionRepository->findInSameQuizWithGreaterOrder($question);
         // Pour chacune de ces questions
         foreach($questionsToReorder as $questionToReorder){
             // Décrémente son ordre de 1
@@ -194,5 +194,49 @@ class QuestionController extends AbstractController
 
         // Sinon, redirige sur la page présentant la question suivante
         return $this->redirectToRoute('question_single', ['id' => $nextQuestion->getId()]);
+    }
+
+    /**
+     * @IsGranted("ROLE_USER")
+     * @Route("/{id}/reorder", name="reorder", methods={"POST"}, requirements={"id":"\d+"})
+     */
+    public function reorder(Question $question, QuestionRepository $questionRepository, EntityManagerInterface $manager, Request $request)
+    {
+        // Vérifie que l'utilisateur authentifié a bien le droit de modifier la question demandée
+        $this->denyAccessUnlessGranted('EDIT', $question);
+        // Récupère la valeur d'ordre désiré envoyée par le formulaire
+        $targetOrder = $request->get('order');
+        // Si la question possède déja l'ordre désiré, ignore la procédure pour réordonner
+        if ($targetOrder != $question->getOrder()) {
+            // Si la valeur d'ordre désiré n'est pas comprise entre 1 et le nombre total de questions dans le même quiz
+            if ($targetOrder < 1 || $targetOrder > $questionRepository->countInSameQuiz($question)) {
+                return new JsonResponse([ 'message' => 'Given order ' . $targetOrder . ' is not valid.' ], Response::HTTP_BAD_REQUEST);
+            }
+            $questionsToReorder = $questionRepository->findInSameQuizWithGreaterOrder($question, $targetOrder);
+            // Si l'ordre de la question à déplacer est supérieur au nouveau rang désiré, il faut augmenter l'ordre des questions qui doivent être réordonnées, sinon il faut le réduire
+            if ($question->getOrder() > $targetOrder) {
+                $increment = 1;
+            } else {
+                $increment = -1;
+            }
+            // Remplace la valeur d'ordre de la question à déplacer par NULL
+            $question->setOrder(null);
+            $manager->persist($question);
+            $manager->flush();
+            // Pour chaque question dont l'ordre est compris entre l'ordre de la question à déplacer et la nouvelle valeur d'ordre désirée
+            foreach ($questionsToReorder as $questionToReorder){
+                // Ajuste l'ordre de la question
+                $questionToReorder->setOrder($questionToReorder->getOrder() + $increment);
+                // Prépare le changement d'ordre a être envoyé en base de données
+                $manager->persist($questionToReorder);
+                $manager->flush();
+            }
+            // Remplace la valeur d'ordre de la question à déplacer par le nouveau rang désiré
+            $question->setOrder($targetOrder);
+            $manager->persist($question);
+            $manager->flush();
+        }
+        // Redirige vers la page "modifier un quiz"
+        return $this->redirectToRoute('quiz_edit', ['id' => $question->getQuiz()->getId()]);
     }
 }

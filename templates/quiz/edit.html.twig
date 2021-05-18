@@ -21,7 +21,23 @@
                     <strong>Question {{ question.order }} ></strong>
                     {{ question.text }}
                 </div>
-                <div>
+                <div class="d-flex">
+                    <form method="post" action="{{ path('question_reorder', {id: question.id}) }}">
+                        <input type="hidden" name="order" value="{{ question.order - 1 }}" />
+                        <button type="submit" class="btn btn-secondary btn-sm"
+                            {% if (question.order == 1) %}
+                                disabled
+                            {% endif %}
+                        ><i class="fas fa-arrow-up"></i></button>
+                    </form>
+                    <form method="post" action="{{ path('question_reorder', {id: question.id}) }}">
+                        <input type="hidden" name="order" value="{{ question.order + 1 }}" />
+                        <button type="submit" class="btn btn-secondary btn-sm"
+                            {% if (question.order == questions|length) %}
+                                disabled
+                            {% endif %}
+                        ><i class="fas fa-arrow-down"></i></button>
+                    </form>
                     <a href="{{ path('question_edit', {id: question.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
                 </div>
             </li>
