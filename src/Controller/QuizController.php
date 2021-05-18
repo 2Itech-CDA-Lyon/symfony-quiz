@@ -102,7 +102,7 @@ class QuizController extends AbstractController
      * 
      * @IsGranted("ROLE_USER")
      */
-    public function edit(Quiz $quiz, Request $request, EntityManagerInterface $entityManager): Response
+    public function edit(Quiz $quiz, Request $request, EntityManagerInterface $entityManager, QuestionRepository $questionRepository): Response
     {
         // Vérifie que l'utilisateur authentifié a le droit de modifier le quiz demandé selon la politique de permissions définie dans les voters
         $this->denyAccessUnlessGranted('EDIT', $quiz);
@@ -117,11 +117,18 @@ class QuizController extends AbstractController
             $entityManager->flush();
             $this->addFlash('success', 'Quiz modifié avec succès');
         }
+
+        $questions = $questionRepository->findBy(
+            ['quiz' => $quiz],
+            ['order' => 'ASC']
+        );
+
         // Affiche la page "modifier un quiz"
         return $this->render('quiz/edit.html.twig', [
             'verb' => 'Modifier',
             'quiz' => $quiz,
             'form' => $form->createView(),
+            'questions' => $questions,
         ]);
     }
 
