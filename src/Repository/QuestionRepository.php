@@ -19,6 +19,25 @@ class QuestionRepository extends ServiceEntityRepository
         parent::__construct($registry, Question::class);
     }
 
+    /**
+     * Find all questions from the same quiz with an order value that is strictly greater than the provided question
+     *
+     * @param Question $question
+     * @return Question[]
+     */
+    public function findInSameQuizWithGreaterOrder(Question $question): array
+    {
+        return $this->createQueryBuilder('q')
+            ->where('q.quiz = :quiz')
+            ->setParameter('quiz', $question->getQuiz())
+            ->andWhere('q.order > :order')
+            ->setParameter('order', $question->getOrder())
+            ->orderBy('q.order', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     // /**
     //  * @return Question[] Returns an array of Question objects
     //  */

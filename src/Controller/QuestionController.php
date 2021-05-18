@@ -112,14 +112,26 @@ class QuestionController extends AbstractController
     /**
      * @Route("/{id}/delete", name="delete", requirements={"id":"\d+"}, methods={"POST"})
      */
-    public function delete(Question $question, EntityManagerInterface $entityManager)
+    public function delete(Question $question, EntityManagerInterface $entityManager, QuestionRepository $questionRepository)
     {
         // Vérifie que l'utilisateur authentifié a le droit de modifier la question demandée selon la politique de permissions définie dans les voters
         $this->denyAccessUnlessGranted('EDIT', $question);
         // Supprime la question en base de données
         $entityManager->remove($question);
         $entityManager->flush();
-        $this->addFlash('success', 'Question supprimée avec suucès!');
+
+        // Récupère toutes les questions appartenant au même quiz, et avec un ordre strictement supérieur à celui de la question supprimée
+        $questionsToReorder = $questionRepository->findInSameQuizWithGreaterOrder($question);
+        // Pour chacune de ces questions
+        foreach($questionsToReorder as $questionToReorder){
+            // Décrémente son ordre de 1
+            $questionToReorder->setOrder($questionToReorder->getOrder() - 1);
+            // Sauvegarde le changement en base de donnéess
+            $entityManager->persist($questionToReorder);
+        }
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Question supprimée avec succès!');
         // Redirige sur la page "modifier un quiz"
         return $this->redirectToRoute('quiz_edit', ['id' => $question->getQuiz()->getId()]);
     }
